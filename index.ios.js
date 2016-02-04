@@ -197,12 +197,14 @@ var styles = StyleSheet.create({
   },
   head: {
     fontSize: 50,
+    color: 'white'
   }, 
   boxValue: {
     justifyContent: 'center',
     fontSize: 70,
     textAlign: 'center',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    color: 'white'
   }
 });
 
