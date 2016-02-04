@@ -179,6 +179,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
     paddingTop:75,
+    backgroundColor: '#3F51B5'
   },
   grid: {
     flex: 1,
@@ -188,7 +189,7 @@ var styles = StyleSheet.create({
   },
   box: {
     borderColor: 'black',
-    backgroundColor: '#fff',
+    backgroundColor: '#C5CAE9',
     borderWidth: 1,
     padding: 10,
     width: 100,
