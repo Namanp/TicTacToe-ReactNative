@@ -7,10 +7,10 @@
 var React = require('react-native');
 var {View, Text, StyleSheet, TouchableOpacity, AppRegistry} = React;
 
-var turn = 0;
-var boxPressedX = [];
-var boxPressedO = [];
-var waysToWin = [["1", "2", "3"],["4", "5", "6"],["7", "8", "9"],["1", "4", "7"],["2", "5", "8"],["3", "6", "9"], ["1", "5", "9"], ["3", "5", "7"]];
+var turn          = 0;
+var boxPressedX   = [];
+var boxPressedO   = [];
+var gameOver      = false;
 
 var GridSquare = React.createClass({
   getInitialState: function() {
@@ -18,62 +18,103 @@ var GridSquare = React.createClass({
       val: "",
     };
   },
-  arraysAreEqual: function(array1, array2) {
-    if (array1.length == array2.length) {
-      for (var i = 0; i < array1.length; i++) {
-        if (array1[i] != array2[i]) {
-          return false;
+
+  // GAME FUNCTIONS ------------------------------------------------------ 
+  // ---------------------------------------------------------------------
+
+  checkWinner: function(boxPressed) {
+    return this.rowsWon(boxPressed) || this.columnsWon(boxPressed) || this.diagonalsWon(boxPressed);
+  },
+
+  pressBox: function() {
+    console.log("Clicked");
+    if (this.state.val == "") {
+      turn += 1;
+      var boxPressed;
+      var potentialWinner;
+
+      var num = parseInt(this.props.num);
+      if (turn%2 == 0) {
+        this.setState({val: "O"});
+        boxPressedO.push(num);
+        boxPressed = boxPressedO;
+        potentialWinner = "O"
+      } else {
+        this.setState({val: "X"});
+        boxPressedX.push(num);
+        boxPressed = boxPressedX;
+        potentialWinner = "X";
+      }
+      
+      if (turn >= 5) {
+        if (this.checkWinner(boxPressed)) {
+          //alert and refresh board
+          alert(potentialWinner + "'s won!");
+          return;
+        }
+
+        if (turn == 9) {
+          alert("Game Over.");
         }
       }
-      return true;
     }
-    return false;
   },
-  checkWinner: function() {
-    //check if anyone won
-    //if so put an alert and reset the game
-    var sortedArray;
-    if (turn%2!=0) {
-      sortedArray = boxPressedO.sort();
-    } else {
-      sortedArray = boxPressedX.sort();
-    }
-    console.log(sortedArray);
-    for (var way in waysToWin) {
-      console.log(way);
-      console.log(waysToWin[way]);
-      console.log(waysToWin[way] === sortedArray)
-      if (this.arraysAreEqual(waysToWin[way], sortedArray)) {
+
+  // HELPER FUNCTIONS ----------------------------------------------------
+  // ---------------------------------------------------------------------
+
+   rowsWon: function(boxPressed) {
+    for (var i = 1; i <= 7; i = i + 3) {
+
+      var won = boxPressed.includes(i) && boxPressed.includes(i+1) && boxPressed.includes(i+2);
+      
+      if (won) {
         return true;
       }
     }
     return false;
   },
-  pressBox: function() {
-    console.log("Clicked");
-    if (this.state.val == "") {
-      turn += 1
-      if (turn%2==0) {
-        this.setState({val: "O"});
-        boxPressedX.push(this.props.num);
-      } else {
-        this.setState({val: "X"});
-        boxPressedO.push(this.props.num);
-      }
-      if (turn >= 5) {
-        if (this.checkWinner()) {
-          //alert and refresh board
-          alert("Someone won");
-        }
+
+  columnsWon: function(boxPressed) {
+    for (var i = 1; i <= 3; i++) {
+      var won = boxPressed.includes(i) && boxPressed.includes(i+3) && boxPressed.includes(i+6);
+      if (won) {
+        return true;
       }
     }
+    return false;
   },
+
+  diagonalsWon: function(boxPressed) {
+    for (var diagonal = 1; diagonal <= 2; diagonal++) {
+      var startBox;
+      var increment;
+      if (diagonal == 1) {
+        startBox = 1;
+        increment = 4;
+      } else {
+        startBox = 3;
+        increment = 2;
+      }
+      var won = boxPressed.includes(startBox) && boxPressed.includes(startBox + increment) && boxPressed.includes(startBox + 2 * increment);
+
+      if (won) {
+        return true;
+      }
+
+    }
+    return false;
+  },
+
+
+
+  
   render() {
     return (
       <View>
         <TouchableOpacity onPress={this.pressBox} style={styles.box}>
-          <Text>{this.props.num}</Text>
-          <Text>{this.state.val}</Text>
+          
+          <Text style={styles.boxValue}>{this.state.val}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -155,6 +196,12 @@ var styles = StyleSheet.create({
   },
   head: {
     fontSize: 50,
+  }, 
+  boxValue: {
+    justifyContent: 'center',
+    fontSize: 70,
+    textAlign: 'center',
+    backgroundColor: 'transparent'
   }
 });
 
